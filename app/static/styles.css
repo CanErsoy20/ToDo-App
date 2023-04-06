@@ -1,5 +1,5 @@
 body {
-  background-color: powderblue;
+  background-color: rgb(185, 202, 204);
 }
 td {
   text-align: center;
@@ -9,8 +9,27 @@ td,
 th {
   border: 1px solid;
 }
-
+tr:nth-child(even) {
+  background-color: #d6eeee;
+}
 table {
-  width: 100%;
+  width: 50%;
   border-collapse: collapse;
+  margin: 40px auto;
+}
+* {
+  text-align: center;
+}
+button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin: 10px;
+  color: white;
+  background-color: rgb(89, 146, 140);
+}
+caption {
+  font-weight: 600;
+  color: red;
+  font-size: 20px;
 }

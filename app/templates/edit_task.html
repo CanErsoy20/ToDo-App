@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <title>ToDos</title>
+  <head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <form action="{{ url_for('updateTask') }}" method="post">
+        <table>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Deadline</th>
+            <th>Task Type</th>
+            <th>Update Task</th>
+          </tr>
+          <tr>
+            <td>
+              <input
+                class="form-control"
+                type="text"
+                id="title"
+                name="title"
+                value="{{editTask.title}}"
+              /><br />
+            </td>
+            <td>
+              <input
+                class="form-control"
+                type="text"
+                id="description"
+                name="description"
+                value="{{editTask.description}}"
+              /><br />
+            </td>
+            <td>
+              <input
+                class="form-control"
+                type="datetime-local"
+                id="deadline"
+                name="deadline"
+                value="{{editTask.deadline}}"
+              />
+            </td>
+            <td>
+              <select class="form-control" name="tasktype" id="tasktype" >
+                
+                <option value="health">Health</option>
+                <option value="job">Job</option>
+                <option value="lifestyle">Lifestyle</option>
+                <option value="family">Family</option>
+                <option value="hobbies">Hobbies</option>
+              </select>
+            </td>
+            <td hidden>
+                <input
+                  class="form-control"
+                  type="text"
+                  id="id"
+                  name="id"
+                  value="{{editTask.id}}"
+                />
+              </td>
+            <td>
+              <button type="submit" class="btn btn-primary">Update Task</button>
+            </td>
+          </tr>
+        </table>
+      </form>
+  </body>
+</html>

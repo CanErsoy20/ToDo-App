@@ -80,7 +80,7 @@ def tasks():
         cursor.execute('SELECT * FROM TaskType')
         taskTypes = cursor.fetchall()
 
-        return render_template('tasks.html', todoTasks = todoTasks, completedTasks = completedTasks, taskTypes = taskTypes)
+        return render_template('tasks.html', todoTasks = todoTasks, completedTasks = completedTasks, taskTypes = taskTypes, )
     else:
         message = 'Please login first!'
         return render_template('login_html', message = message)
@@ -131,15 +131,38 @@ def addTask():
     else: 
         message = 'Please fill all fields'
         return redirect(url_for('tasks', message = message))
+    
 @app.route('/editTask', methods =['GET', 'POST'])
 def editTask():
     message = ''
     if request.method == 'POST' and 'editid' in request.form:
-        editid = request.form['editid']
-        return redirect(url_for('tasks', editid = editid))
+        editid =  int(request.form['editid'])
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM Task WHERE id = % s", (editid, ))
+        editTask = cursor.fetchone()
+        return render_template('edit_task.html', message = message, editTask = editTask)
     else: 
         message = 'Please fill all fields'
         return redirect(url_for('tasks', message = message))
+    
+@app.route('/updateTask', methods =['GET', 'POST'])
+def updateTask():
+    message = ''
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    if session['loggedin']:
+        taskId = request.form['id']
+        title = request.form['title']
+        description = request.form['description']
+        deadline = request.form['deadline']
+        taskType = request.form['tasktype']
+        cursor.execute('UPDATE Task SET title = % s, description = % s, deadline = % s, task_type = % s WHERE id = % s' , (title, description, deadline, taskType, taskId))
+        mysql.connection.commit()
+        return redirect(url_for('tasks', message = message))
+    else: 
+        message = 'Please fill all fields'
+        return redirect(url_for('tasks', message = message))
+    
 @app.route('/analysis', methods =['GET', 'POST'])
 def analysis():
     message = ''
@@ -152,7 +175,7 @@ def analysis():
         cursor.execute("SELECT AVG(TIMESTAMPDIFF(MINUTE, creation_time, done_time)) as avg_time FROM Task WHERE user_id = % s AND status = % s", (userId, "Done"))
         avgCompTime = cursor.fetchone()
         
-        cursor.execute("SELECT task_type, COUNT(task_type) as number from Task WHERE user_id = % s AND status = % s GROUP BY task_type", (userId, "Done"))
+        cursor.execute("SELECT task_type, COUNT(task_type) as number from Task WHERE user_id = % s AND status = % s GROUP BY task_type ORDER BY number DESC", (userId, "Done"))
         numCompTasks = cursor.fetchall()
 
         cursor.execute("SELECT title, deadline FROM Task WHERE user_id = % s AND status != 'Done' ORDER BY deadline DESC", (session['userid'],))

@@ -14,7 +14,8 @@
     {% endif %}
 
     <form action="{{ url_for('addTask') }}" method="post">
-      <table>
+      <table >
+        <caption>Add New Task</caption>
         <tr>
           <th>Title</th>
           <th>Description</th>
@@ -49,11 +50,11 @@
           </td>
           <td>
             <select class="form-control" name="tasktype" id="tasktype">
-              <option value="health">Health</option>
-              <option value="job">Job</option>
-              <option value="lifestyle">Lifestyle</option>
-              <option value="family">Family</option>
-              <option value="hobbies">Hobbies</option>
+              <option value="Health">Health</option>
+              <option value="Job">Job</option>
+              <option value="Lifestyle">Lifestyle</option>
+              <option value="Family">Family</option>
+              <option value="Hobbies">Hobbies</option>
             </select>
           </td>
           <td>
@@ -62,11 +63,12 @@
         </tr>
       </table>
     </form>
-    <p1>Tasks To Do</p1>
+   
     <!-- Tasks to do table -->
     {% if todoTasks is defined and todoTasks %}
 
     <table>
+      <caption>Tasks To Do</caption>
       <tr>
         <th>ID</th>
         <th>Title</th>
@@ -80,10 +82,11 @@
         <th>Edit Task</th>
         <th>Remove Task</th>
       </tr>
+
       {% for todoTask in todoTasks %}
       <tr>
-        <td>{{todoTask.title}}</td>
         <td>{{todoTask.id}}</td>
+        <td>{{todoTask.title}}</td>
         <td>{{todoTask.description}}</td>
         <td>{{todoTask.status}}</td>
         <td>{{todoTask.deadline}}</td>
@@ -131,13 +134,14 @@
     </table>
 
     {% else %}
-    <p1> You do not have any upcoming todo's!</p1>
-    <p1> Congrats! </p1>
+    <h1 style="color: green;"> You do not have any upcoming todo's!</h1>
+    <h1 style="color: green;"> Congrats! </h1>
     {% endif %}
-    <p1>Completed Tasks</p1>
+    
     <!-- Tasks to do table -->
     {% if completedTasks is defined and completedTasks %}
     <table>
+      <caption>Completed Tasks</caption>
       <tr>
         <th>ID</th>
         <th>Title</th>
@@ -168,7 +172,7 @@
     {% endif %}
     <form action="{{ url_for('analysis') }}" method="post">
       <button type="submit" name="analysis" class="btn btn-primary">
-        Go to analysises
+        Go To Analyses
       </button>
     </form>
     <form action="{{ url_for('logout') }}" method="post">
