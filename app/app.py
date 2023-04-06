@@ -1,6 +1,7 @@
 
 import re  
 import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
@@ -69,14 +70,32 @@ def register():
 def tasks():
     if session['loggedin']:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM Task WHERE user_id = % s', (session['userid'],))
-        tasks = cursor.fetchall()
+        cursor.execute('SELECT * FROM Task WHERE user_id = % s AND status != "Done" ORDER BY deadline DESC', (session['userid'],))
+        todoTasks  = cursor.fetchall()
 
-        return render_template('tasks.html', tasks = tasks)
+        cursor.execute('SELECT * FROM Task T WHERE user_id = % s AND status = "Done" ORDER BY (SELECT DATEDIFF((SELECT done_time FROM Task WHERE id = T.id), (SELECT creation_time FROM Task WHERE id = T.id))) ASC', (session['userid'],))
+        completedTasks = cursor.fetchall()
+        
+        return render_template('tasks.html', todoTasks = todoTasks, completedTasks = completedTasks)
     else:
         message = 'Please login first!'
         return render_template('login_html', message = message)
 
+@app.route('/doTask', methods =['GET', 'POST'])
+def doTask():
+    if request.method == 'POST' and 'taskid' and 'title' in request.form:
+        taskId = request.form['taskid']
+        taskTitle = request.form['title']
+        doneTime = datetime.now()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('UPDATE Task SET done_time = % s, status = % s WHERE id = % s)', (doneTime, 'Done', taskId))
+        mysql.connection.cursor(MySQLdb.cursors.DictCursor).commit()
+        message = 'Successfully finished the task % s', (taskTitle)
+        return redirect(url_for('tasks', message = message))
+    else:
+        message = 'Something went wrong!'
+        return redirect(url_for('tasks', message = message))
+    
 @app.route('/analysis', methods =['GET', 'POST'])
 def analysis():
     return "Analysis page"

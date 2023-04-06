@@ -1,35 +1,77 @@
 {% if message is defined and message %}
-	<div class="alert alert-warning">{{ message }}</div>
-{% endif %}
-{% if tasks is defined and tasks %}
+<div class="alert alert-warning">{{ message }}</div>
+{% endif %} 
+<p1>Tasks To Do</p1>
+<!-- Tasks to do table -->
+{% if todoTasks is defined and todoTasks %}
+<form action="{{ url_for('doTask') }}" method="post"></form>
 <table>
-	<tr>
-		<th>ID</th>
-		<th>Title</th>
-		<th>Description</th>
-		<th>Status</th>
-		<th>Deadline</th>
-		<th>Creation Time</th>
-		<th>Done Time</th>
-		<th>Task Type</th>
-		<th>Mark As Done</th>
-	</tr>
-	{% for task in tasks %}
-	<tr>
-		<td>{{task.id}}</td>
-		<td>{{task.title}}</td>
-		<td>{{task.description}}</td>
-		<td>{{task.status}}</td>
-		<td>{{task.deadline}}</td>
-		<td>{{task.creation_time}}</td>
-		{%if task.done_time%}
-			<td>{{task.done_time}}</td>
-		{%else %}
-			<td>Not Done Yet</td>
-		{% endif %}
-		<td>{{task.task_type}}</td>
-		<td><button class="btn btn-primary">Do</button></td>
-	</tr>
-	{% endfor %}
+  <tr>
+    <th>ID</th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Status</th>
+    <th>Deadline</th>
+    <th>Creation Time</th>
+    <th>Done Time</th>
+    <th>Task Type</th>
+    <th>Mark As Done</th>
+  </tr>
+  {% for todoTask in todoTasks %}
+  <tr>
+    <td class="form-control" type="taskid" id="taskid" name = "taskid" >{{todoTask.id}}</td>
+    <td class="form-control" type="title" id="title" name = "title">{{todoTask.title}}</td>
+    <td>{{todoTask.description}}</td>
+    <td>{{todoTask.status}}</td>
+    <td>{{todoTask.deadline}}</td>
+    <td>{{todoTask.creation_time}}</td>
+    {%if todoTask.done_time%}
+    <td>{{todoTask.done_time}}</td>
+    {%else %}
+    <td>Not Done Yet</td>
+    {% endif %}
+    <td>{{todoTask.task_type}}</td>
+    {% if todoTask.status != 'Done' %}
+    <td>
+      <button type="submit" class="btn btn-primary">Do task</button>
+    </td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+</table>
+</form>
+{% endif %}
+
+<p1>Completed Tasks</p1>
+<!-- Tasks to do table -->
+{% if completedTasks is defined and completedTasks %}
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Status</th>
+    <th>Deadline</th>
+    <th>Creation Time</th>
+    <th>Done Time</th>
+    <th>Task Type</th>
+  </tr>
+  {% for completedTask in completedTasks %}
+  <tr>
+    <td class="form-control" id="taskid" name = "taskid" >{{completedTask.id}}</td>
+    <td class="form-control" id="title" name = "title">{{completedTask.title}}</td>
+    <td>{{completedTask.description}}</td>
+    <td>{{completedTask.status}}</td>
+    <td>{{completedTask.deadline}}</td>
+    <td>{{completedTask.creation_time}}</td>
+    {%if completedTask.done_time%}
+    <td>{{completedTask.done_time}}</td>
+    {%else %}
+    <td>Not Done Yet</td>
+    {% endif %}
+    <td>{{completedTask.task_type}}</td>
+  </tr>
+  {% endfor %}
 </table>
 {% endif %}
+
