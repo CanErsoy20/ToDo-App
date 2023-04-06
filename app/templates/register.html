@@ -1,3 +1,12 @@
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
 <form action="{{ url_for('register') }}" method="post">
 	{% if message is defined and message %}
 		<div class="alert alert-warning">{{ message }}</div>
@@ -6,10 +15,13 @@
 		<label for="username">Username:</label>
 		<input type="text" class="form-control" id="username" name="username" placeholder="Enter name">
 	</div>
+	<br>
 	<div class="form-group">
 		<label for="email">Email:</label>
 		<input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
 	</div>
+	<br>
+
 	<div class="form-group">
 		<label for="pwd">Password:</label>
 		<input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
@@ -21,3 +33,5 @@
 <form action="{{ url_for('login') }}" method="get">
 <button class="btn btn-primary">Login</button>
 </form>
+</body>
+</html>
