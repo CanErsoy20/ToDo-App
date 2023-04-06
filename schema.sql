@@ -11,7 +11,7 @@ CREATE TABLE TaskType (type varchar(255),
     primary key (type));
 
 CREATE TABLE Task (
-    id int,
+    id int NOT NULL AUTO_INCREMENT,
     title varchar(255),
     description text,
     status varchar (255),

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <h2>
+        Your late deadlines and their latencies
+      </h2>
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Latency</th>
+      </tr>
+      {% for lateTask in lateTasks %}
+      <tr>
+        <td>{{lateTask.title}}</td>
+        <td>{{lateTask.latency}}</td>
+      </tr>
+      {% endfor%}
+    </table>
+    <h2>
+      Your average task completion time is: {{avgCompTime.avg_time}} minutes
+    </h2>
+    <table>
+      <tr>
+        <th>Task Type</th>
+        <th>Count</th>
+      </tr>
+      {% for numCompTask in numCompTasks %}
+      <tr>
+        <td>{{numCompTask.task_type}}</td>
+        <td>{{numCompTask.number}}</td>
+      </tr>
+      {% endfor%}
+    </table>
+    <h2>
+        Your uncompleted tasks sorted by increasing order of deadlines
+      </h2>
+    <table>
+        <tr>
+          <th>Title</th>
+          <th>Deadline</th>
+        </tr>
+        {% for uncompletedTask in uncompletedTasks %}
+        <tr>
+          <td>{{uncompletedTask.title}}</td>
+          <td>{{uncompletedTask.deadline}}</td>
+        </tr>
+        {% endfor%}
+      </table>
+      <h2>
+        Your top 2 tasks that took the most time
+      </h2>
+      <table>
+        <tr>
+          <th>Title</th>
+          <th>Completion Time</th>
+        </tr>
+        {% for task in top2Longest %}
+        <tr>
+          <td>{{task.title}}</td>
+          <td>{{task.compTime}}</td>
+        </tr>
+        {% endfor%}
+      </table>
+      <form action="{{ url_for('tasks') }}" method="get">
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
+          Go to tasks
+        </button>
+      </form>
+  </body>
+</html>

@@ -37,7 +37,7 @@ def login():
             return redirect(url_for('tasks'))
         else:
             message = 'Please enter correct email / password !'
-    return render_template('login.html', message = message)
+    return render_template('login.html', message = message, )
 
 
 @app.route('/register', methods =['GET', 'POST'])
@@ -70,36 +70,107 @@ def register():
 def tasks():
     if session['loggedin']:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM Task WHERE user_id = % s AND status != "Done" ORDER BY deadline DESC', (session['userid'],))
-        todoTasks  = cursor.fetchall()
+        
+        cursor.execute('SELECT * FROM Task WHERE user_id = % s AND status != "Done" ORDER BY deadline ASC', (session['userid'],))
+        todoTasks = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM Task T WHERE user_id = % s AND status = "Done" ORDER BY (SELECT DATEDIFF((SELECT done_time FROM Task WHERE id = T.id), (SELECT creation_time FROM Task WHERE id = T.id))) ASC', (session['userid'],))
+        cursor.execute('SELECT * FROM Task T WHERE user_id = % s AND status = "Done" ORDER BY done_time ASC', (session['userid'],))
         completedTasks = cursor.fetchall()
         
-        return render_template('tasks.html', todoTasks = todoTasks, completedTasks = completedTasks)
+        cursor.execute('SELECT * FROM TaskType')
+        taskTypes = cursor.fetchall()
+
+        return render_template('tasks.html', todoTasks = todoTasks, completedTasks = completedTasks, taskTypes = taskTypes)
     else:
         message = 'Please login first!'
         return render_template('login_html', message = message)
 
 @app.route('/doTask', methods =['GET', 'POST'])
 def doTask():
+    message = ''
     if request.method == 'POST' and 'taskid' in request.form:
         taskId = request.form['taskid']
         doneTime = datetime.now()
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('UPDATE Task SET done_time = % s, status = % s WHERE id = % s', (doneTime, 'Done', taskId))
         mysql.connection.commit()
-        message = 'Successfully finished the task'
+        
         return redirect(url_for('tasks', message = message))
-     
     else:
         message = 'Something went wrong!'
         return redirect(url_for('tasks', message = message))
     
+@app.route('/deleteTask', methods =['GET', 'POST'])
+def deleteTask():
+    message = ''
+    if request.method == 'POST' and 'taskid' in request.form:
+        taskId = request.form['taskid']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('DELETE FROM Task WHERE id = % s', (taskId))
+        mysql.connection.commit()
+        return redirect(url_for('tasks', message = message))
+    else:
+        message = 'Something went wrong!'
+        return redirect(url_for('tasks', message = message))
+    
+@app.route('/addTask', methods =['GET', 'POST'])
+def addTask():
+    message = ''
+    if request.method == 'POST' and 'title' in request.form and 'description' in request.form and 'deadline' in request.form and 'tasktype' in request.form:
+        userId = session['userid']
+        title = request.form['title']
+        description = request.form['description']
+        status = "Todo"
+        deadline = request.form['deadline']
+        creationTime = datetime.now()
+        taskType = request.form['tasktype']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('INSERT INTO Task VALUES (NULL, % s, % s,% s,% s,% s, NULL, % s,% s)', (title, description, status, deadline, creationTime, userId, taskType))
+        mysql.connection.commit()
+        return redirect(url_for('tasks', message = message))
+    else: 
+        message = 'Please fill all fields'
+        return redirect(url_for('tasks', message = message))
+@app.route('/editTask', methods =['GET', 'POST'])
+def editTask():
+    message = ''
+    if request.method == 'POST' and 'editid' in request.form:
+        editid = request.form['editid']
+        return redirect(url_for('tasks', editid = editid))
+    else: 
+        message = 'Please fill all fields'
+        return redirect(url_for('tasks', message = message))
 @app.route('/analysis', methods =['GET', 'POST'])
 def analysis():
-    return "Analysis page"
+    message = ''
+    if session['loggedin']:
+        userId = session['userid']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT title, TIMESTAMPDIFF(MINUTE, deadline, done_time) as latency FROM Task WHERE user_id = % s AND status = % s AND done_time > deadline", (userId, "Done"))
+        lateTasks= cursor.fetchall()
+       
+        cursor.execute("SELECT AVG(TIMESTAMPDIFF(MINUTE, creation_time, done_time)) as avg_time FROM Task WHERE user_id = % s AND status = % s", (userId, "Done"))
+        avgCompTime = cursor.fetchone()
+        
+        cursor.execute("SELECT task_type, COUNT(task_type) as number from Task WHERE user_id = % s AND status = % s GROUP BY task_type", (userId, "Done"))
+        numCompTasks = cursor.fetchall()
 
+        cursor.execute("SELECT title, deadline FROM Task WHERE user_id = % s AND status != 'Done' ORDER BY deadline DESC", (session['userid'],))
+        uncompletedTasks = cursor.fetchall()
+
+        cursor.execute("SELECT title, TIMESTAMPDIFF(MINUTE, creation_time, done_time) as compTime FROM Task where user_id = % s AND status = % s ORDER BY compTime DESC LIMIT 2", (userId, "Done"))
+        top2Longest = cursor.fetchall()
+    return render_template('analysis.html', message = message, lateTasks = lateTasks, avgCompTime = avgCompTime, numCompTasks = numCompTasks, uncompletedTasks = uncompletedTasks, top2Longest = top2Longest)
+
+@app.route('/logout', methods =['GET', 'POST'])
+def logout():
+    message = ''
+    session['loggedin'] = False
+    session['userid'] = ''
+    session['username'] = ''
+    session['email'] = ''
+    session.clear()
+    return redirect(url_for('login', message = message))
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, host='0.0.0.0', port=port)

@@ -1,77 +1,180 @@
-{% if message is defined and message %}
-<div class="alert alert-warning">{{ message }}</div>
-{% endif %} 
-<p1>Tasks To Do</p1>
-<!-- Tasks to do table -->
-{% if todoTasks is defined and todoTasks %}
-<form action="{{ url_for('doTask') }}" method="post">
-<table>
-  <tr>
-    <th>ID</th>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Status</th>
-    <th>Deadline</th>
-    <th>Creation Time</th>
-    <th>Done Time</th>
-    <th>Task Type</th>
-    <th>Mark As Done</th>
-  </tr>
-  {% for todoTask in todoTasks %}
-  <tr>
-    <td>{{todoTask.id}}</td>
-    <td>{{todoTask.title}}</td>
-    <td>{{todoTask.description}}</td>
-    <td>{{todoTask.status}}</td>
-    <td>{{todoTask.deadline}}</td>
-    <td>{{todoTask.creation_time}}</td>
-    {%if todoTask.done_time%}
-    <td>{{todoTask.done_time}}</td>
-    {%else %}
-    <td>Not Done Yet</td>
+<!DOCTYPE html>
+<html>
+  <title>ToDos</title>
+  <head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    {% if message is defined and message %}
+    <div class="alert alert-warning">{{ message }}</div>
     {% endif %}
-    <td>{{todoTask.task_type}}</td>
-    {% if todoTask.status != 'Done' %}
-    <td>
-      <button name ="taskid" type="submit" value = "{{todoTask.id}}" class="btn btn-primary">Do task</button>
-    </td>
-    {% endif %}
-  </tr>
-  {% endfor %}
-</table>
-</form>
-{% endif %}
 
-<p1>Completed Tasks</p1>
-<!-- Tasks to do table -->
-{% if completedTasks is defined and completedTasks %}
-<table>
-  <tr>
-    <th>ID</th>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Status</th>
-    <th>Deadline</th>
-    <th>Creation Time</th>
-    <th>Done Time</th>
-    <th>Task Type</th>
-  </tr>
-  {% for completedTask in completedTasks %}
-  <tr>
-    <td class="form-control" id="taskid" name = "taskid" >{{completedTask.id}}</td>
-    <td class="form-control" id="title" name = "title">{{completedTask.title}}</td>
-    <td>{{completedTask.description}}</td>
-    <td>{{completedTask.status}}</td>
-    <td>{{completedTask.deadline}}</td>
-    <td>{{completedTask.creation_time}}</td>
-    {%if completedTask.done_time%}
-    <td>{{completedTask.done_time}}</td>
-    {%else %}
-    <td>Not Done Yet</td>
-    {% endif %}
-    <td>{{completedTask.task_type}}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% endif %}
+    <form action="{{ url_for('addTask') }}" method="post">
+      <table>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Deadline</th>
+          <th>Task Type</th>
+          <th>Add Task</th>
+        </tr>
+        <tr>
+          <td>
+            <input
+              class="form-control"
+              type="text"
+              id="title"
+              name="title"
+            /><br />
+          </td>
+          <td>
+            <input
+              class="form-control"
+              type="text"
+              id="description"
+              name="description"
+            /><br />
+          </td>
+          <td>
+            <input
+              class="form-control"
+              type="datetime-local"
+              id="deadline"
+              name="deadline"
+            />
+          </td>
+          <td>
+            <select class="form-control" name="tasktype" id="tasktype">
+              <option value="health">Health</option>
+              <option value="job">Job</option>
+              <option value="lifestyle">Lifestyle</option>
+              <option value="family">Family</option>
+              <option value="hobbies">Hobbies</option>
+            </select>
+          </td>
+          <td>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+          </td>
+        </tr>
+      </table>
+    </form>
+    <p1>Tasks To Do</p1>
+    <!-- Tasks to do table -->
+    {% if todoTasks is defined and todoTasks %}
 
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Deadline</th>
+        <th>Creation Time</th>
+        <th>Done Time</th>
+        <th>Task Type</th>
+        <th>Mark As Done</th>
+        <th>Edit Task</th>
+        <th>Remove Task</th>
+      </tr>
+      {% for todoTask in todoTasks %}
+      <tr>
+        <td>{{todoTask.title}}</td>
+        <td>{{todoTask.id}}</td>
+        <td>{{todoTask.description}}</td>
+        <td>{{todoTask.status}}</td>
+        <td>{{todoTask.deadline}}</td>
+        <td>{{todoTask.creation_time}}</td>
+        <td>Not Done Yet</td>
+        <td>{{todoTask.task_type}}</td>
+        <td>
+          <form action="{{ url_for('doTask') }}" method="post">
+            <button
+              name="taskid"
+              type="submit"
+              value="{{todoTask.id}}"
+              class="btn btn-primary"
+            >
+              Do task
+            </button>
+          </form>
+        </td>
+        <td>
+          <form action="{{ url_for('editTask') }}" method="post">
+            <button
+              name="editid"
+              type="submit"
+              value="{{todoTask.id}}"
+              class="btn btn-primary"
+            >
+              Edit task
+            </button>
+          </form>
+        </td>
+        <td>
+          <form action="{{ url_for('deleteTask') }}" method="post">
+            <button
+              name="taskid"
+              type="submit"
+              value="{{todoTask.id}}"
+              class="btn btn-primary"
+            >
+              Remove task
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    {% else %}
+    <p1> You do not have any upcoming todo's!</p1>
+    <p1> Congrats! </p1>
+    {% endif %}
+    <p1>Completed Tasks</p1>
+    <!-- Tasks to do table -->
+    {% if completedTasks is defined and completedTasks %}
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Deadline</th>
+        <th>Creation Time</th>
+        <th>Done Time</th>
+        <th>Task Type</th>
+      </tr>
+      {% for completedTask in completedTasks %}
+      <tr>
+        <td>{{completedTask.id}}</td>
+        <td>{{completedTask.title}}</td>
+        <td>{{completedTask.description}}</td>
+        <td>{{completedTask.status}}</td>
+        <td>{{completedTask.deadline}}</td>
+        <td>{{completedTask.creation_time}}</td>
+        {%if completedTask.done_time%}
+        <td>{{completedTask.done_time}}</td>
+        {%else %}
+        <td>Not Done Yet</td>
+        {% endif %}
+        <td>{{completedTask.task_type}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+    <form action="{{ url_for('analysis') }}" method="post">
+      <button type="submit" name="analysis" class="btn btn-primary">
+        Go to analysises
+      </button>
+    </form>
+    <form action="{{ url_for('logout') }}" method="post">
+      <button type="submit" name="logout" class="btn btn-primary">
+        Logout
+      </button>
+    </form>
+  </body>
+</html>
