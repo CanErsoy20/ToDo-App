@@ -4,7 +4,7 @@
 <p1>Tasks To Do</p1>
 <!-- Tasks to do table -->
 {% if todoTasks is defined and todoTasks %}
-<form action="{{ url_for('doTask') }}" method="post"></form>
+<form action="{{ url_for('doTask') }}" method="post">
 <table>
   <tr>
     <th>ID</th>
@@ -19,8 +19,8 @@
   </tr>
   {% for todoTask in todoTasks %}
   <tr>
-    <td class="form-control" type="taskid" id="taskid" name = "taskid" >{{todoTask.id}}</td>
-    <td class="form-control" type="title" id="title" name = "title">{{todoTask.title}}</td>
+    <td>{{todoTask.id}}</td>
+    <td>{{todoTask.title}}</td>
     <td>{{todoTask.description}}</td>
     <td>{{todoTask.status}}</td>
     <td>{{todoTask.deadline}}</td>
@@ -33,7 +33,7 @@
     <td>{{todoTask.task_type}}</td>
     {% if todoTask.status != 'Done' %}
     <td>
-      <button type="submit" class="btn btn-primary">Do task</button>
+      <button name ="taskid" type="submit" value = "{{todoTask.id}}" class="btn btn-primary">Do task</button>
     </td>
     {% endif %}
   </tr>

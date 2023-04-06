@@ -83,15 +83,15 @@ def tasks():
 
 @app.route('/doTask', methods =['GET', 'POST'])
 def doTask():
-    if request.method == 'POST' and 'taskid' and 'title' in request.form:
+    if request.method == 'POST' and 'taskid' in request.form:
         taskId = request.form['taskid']
-        taskTitle = request.form['title']
         doneTime = datetime.now()
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('UPDATE Task SET done_time = % s, status = % s WHERE id = % s)', (doneTime, 'Done', taskId))
-        mysql.connection.cursor(MySQLdb.cursors.DictCursor).commit()
-        message = 'Successfully finished the task % s', (taskTitle)
+        cursor.execute('UPDATE Task SET done_time = % s, status = % s WHERE id = % s', (doneTime, 'Done', taskId))
+        mysql.connection.commit()
+        message = 'Successfully finished the task'
         return redirect(url_for('tasks', message = message))
+     
     else:
         message = 'Something went wrong!'
         return redirect(url_for('tasks', message = message))
